@@ -1,65 +1,149 @@
-import Image from "next/image";
+import { db } from '@/lib/firebaseAdmin';
+import EquipmentTable from '@/components/EquipmentTable';
 
-export default function Home() {
+export const revalidate = 3600;
+
+async function getEquipments() {
+  try {
+    const snapshot = await db.collection('equipments').get();
+    if (snapshot.empty) {
+      return [];
+    }
+    // Serialize data: Convert Firestore Timestamps to generic objects or strings
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      const serializedData: any = { 
+        id: doc.id,
+        // Map verbose Excel keys to cleaner keys for the component
+        no: data['NO'],
+        equipment_id: data['EQUIPMENT ID'],
+        type: data['TYPE'],
+        area: data['AREA'],
+        subcont_vendor: data['Subcont/ Vendor'],
+        
+        // L1
+        roj_date: data['L1 - RED TAG ROJ Date'],
+        msra_submit: data['L1 - RED TAG MSRA Submit'],
+        ptw_submit: data['L1 - RED TAG PTW Submit'],
+        sai_date: data['L1 - RED TAG SAI Date'],
+        submit_anchore_spec: data['L1 - RED TAG Submit Anchore Spec'],
+        positioning_anchoring_start_date: data['L1 - RED TAG Positioning Anchoring Start Date'],
+        anchored_verified_qc: data['L1 - RED TAG Anchored Verified QC'],
+        red_tag_passed_date: data['L1 - RED TAG Red Tag Passed Date'],
+        l1_status: data['L1 - RED TAG Status'],
+        l1_remark_cx: data['L1 - RED TAG Remark Cx Issue'],
+        l1_remarks_ptw: data['L1 - RED TAG Remarks PTW + MSRA Issue'],
+        
+        // L2
+        l2_start_date: data['L2 - YELLOW TAG Start Date'],
+        l2_end_date: data['L2 - YELLOW TAG End Date'],
+        msra_loto_submit: data['L2 - YELLOW TAG MSRA + LOTO Plan Submit'],
+        power_control_cable_inplace: data['L2 - YELLOW TAG Power and Control Cable (EPMS/BAS) Inplace'],
+        elec_tests_completed: data['L2 - YELLOW TAG Electrical Tests Completed'],
+        mech_tests_completed: data['L2 - YELLOW TAG Mech Tests Completed'],
+        installer_pre_startup_completed: data['L2 - YELLOW TAG Installer Pre-Startup Completed'],
+        vendor_ps_required: data['L2 - YELLOW TAG Vendor PS Required (Y/N)'],
+        vendor_pre_startup_completed: data['L2 - YELLOW TAG Vendor Pre-Startup Completed'],
+        l2_qa_qc_script_completed: data['L2 - YELLOW TAG L2 QA/QC Script Completed'],
+        l2_docs_uploaded: data['L2 - YELLOW TAG L2 Docs Uploaded (ACMS)'],
+        loto_plan_implemented: data['L2 - YELLOW TAG LOTO Plan Implemented'],
+        ivc_completed: data['L2 - YELLOW TAG IVC Completed (CxA)'],
+        cyt_required: data['L2 - YELLOW TAG CYT? (Y/N)'],
+        cyt_end_date: data['L2 - YELLOW TAG CYT End Date'],
+        cyt_finished: data['L2 - YELLOW TAG CYT Finish? (Y/N)'],
+        yt_passed_date: data['L2 - YELLOW TAG YT Passed Date'],
+        l2_status: data['L2 - YELLOW TAG Status'],
+        l2_remark_cx: data['L2 - YELLOW TAG Remark Cx Issue'],
+        l2_remarks_ptw: data['L2 - YELLOW TAG Remarks PTW Issue'],
+
+        // L3
+        l3_start_date: data['L3 - GREEN TAG Start Date'],
+        l3_end_date: data['L3 - GREEN TAG End Date'],
+        energization_msra_submitted: data['L3 - GREEN TAG Energization MSRA Submitted'],
+        comm_scripts_submitted: data['L3 - GREEN TAG Commissioning Scripts Submitted'],
+        load_bank_plan_submitted: data['L3 - GREEN TAG Load Bank Plan Submitted'],
+        startup_plan_submitted: data['L3 - GREEN TAG Startup Plan Submitted'],
+        pre_energization_meeting: data['L3 - GREEN TAG Pre-Energization Meeting'],
+        energization_plan_submitted: data['L3 - GREEN TAG Energization Plan Submitted'],
+        load_bank_required: data['L3 - GREEN TAG Load Bank Required? (Y/N)'],
+        temp_load_bank_install: data['L3 - GREEN TAG Temporary Load bank installation'],
+        l3_ptw_submit: data['L3 - GREEN TAG PTW Submit'],
+        energized_date: data['L3 - GREEN TAG Energized Date'],
+        l3_startup_scripts_completed: data['L3 - GREEN TAG L3 Startup Scripts Completed (ACMS)'],
+        fok_witnessed: data['L3 - GREEN TAG FoK Witnessed (Y/N)'],
+        load_burn_in_completed: data['L3 - GREEN TAG Load & Burn in Test Completed'],
+        ir_scan_uploaded: data['L3 - GREEN TAG IR Scan / TMS Report Uploaded'],
+        epms_verification_completed: data['L3 - GREEN TAG EPMS Verification Completed'],
+        open_close_issues: data['L3 - GREEN TAG Open/ Close Cx Issues'],
+        green_tag_passed_date: data['L3 - GREEN TAG Green Tag Passed Date (Completed)'],
+        l3_status: data['L3 - GREEN TAG Status'],
+        l3_remarks: data['L3 - GREEN TAG Remarks Cx / PTW Issue'],
+
+        ...data 
+      };
+      
+      // Basic recursive serialization for timestamps (legacy check, though we are mapping mostly strings now from JSON upload)
+      for (const key in serializedData) {
+        if (serializedData[key] && typeof serializedData[key] === 'object') {
+           // Check for Firestore Timestamp (duck typing)
+           if ('_seconds' in serializedData[key]) {
+             serializedData[key] = {
+               _seconds: serializedData[key]._seconds,
+               _nanoseconds: serializedData[key]._nanoseconds
+             };
+           } else if (serializedData[key].toDate) {
+             const date = serializedData[key].toDate();
+             serializedData[key] = {
+                _seconds: Math.floor(date.getTime() / 1000),
+                _nanoseconds: 0 
+             };
+           }
+        }
+      }
+      return serializedData;
+    }).sort((a, b) => {
+      const noA = parseInt(String(a.no)) || 0;
+      const noB = parseInt(String(b.no)) || 0;
+      return noA - noB;
+    });
+  } catch (error) {
+    console.error("Error fetching equipments:", error);
+    return [];
+  }
+}
+
+export default async function Home() {
+  const equipments = await getEquipments();
+
+  const totalEquipments = equipments.length;
+  const areaCounts = equipments.reduce((acc: Record<string, number>, item: any) => {
+    const area = item.area || 'Unknown';
+    acc[area] = (acc[area] || 0) + 1;
+    return acc;
+  }, {});
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen p-4 md:p-8 bg-gray-50">
+      <div className="max-w-[98%] mx-auto">
+        <h1 className="text-3xl font-bold mb-6 text-black">CX Tracking Schedule</h1>
+        
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
+            <h3 className="text-gray-500 text-sm font-medium">Total Equipment</h3>
+            <p className="text-2xl font-bold text-gray-800">{totalEquipments}</p>
+          </div>
+          {Object.entries(areaCounts).map(([area, count]) => (
+            <div key={area} className="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+              <h3 className="text-gray-500 text-sm font-medium">Area: {area}</h3>
+              <p className="text-2xl font-bold text-gray-800">{count}</p>
+            </div>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="bg-white rounded-lg shadow p-4">
+             <EquipmentTable data={equipments} />
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
