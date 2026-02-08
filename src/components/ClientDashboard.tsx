@@ -8,6 +8,16 @@ export default function ClientDashboard({ initialData }: { initialData: any[] })
 	const [areaFilter, setAreaFilter] = useState("All");
 	const [levelFilter, setLevelFilter] = useState("All");
 
+	// State for dynamic reference dates
+	const [l1PlanStart, setL1PlanStart] = useState<Date>(new Date("2025-11-10"));
+	const [l1PlanEnd, setL1PlanEnd] = useState<Date>(new Date("2025-12-01"));
+	
+	const [l2PlanStart, setL2PlanStart] = useState<Date>(new Date("2026-01-26"));
+	const [l2PlanEnd, setL2PlanEnd] = useState<Date>(new Date("2026-02-16"));
+
+	const [l3PlanStart, setL3PlanStart] = useState<Date>(new Date("2026-04-22"));
+	const [l3PlanEnd, setL3PlanEnd] = useState<Date>(new Date("2026-04-30"));
+
 	const vendors = useMemo(() => {
 		return ["All", ...Array.from(new Set(initialData.map(item => item.subcont_vendor).filter(Boolean)))].sort();
 	}, [initialData]);
@@ -60,6 +70,9 @@ export default function ClientDashboard({ initialData }: { initialData: any[] })
 						setLevelFilter={setLevelFilter}
 						vendors={vendors}
 						areas={areas}
+						l1Dates={{ start: l1PlanStart, end: l1PlanEnd, setStart: setL1PlanStart, setEnd: setL1PlanEnd }}
+						l2Dates={{ start: l2PlanStart, end: l2PlanEnd, setStart: setL2PlanStart, setEnd: setL2PlanEnd }}
+						l3Dates={{ start: l3PlanStart, end: l3PlanEnd, setStart: setL3PlanStart, setEnd: setL3PlanEnd }}
 					/>
 				</div>
 			</div>

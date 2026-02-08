@@ -23,7 +23,10 @@ export default function EquipmentTable({
 	levelFilter,
 	setLevelFilter,
 	vendors,
-	areas
+	areas,
+	l1Dates,
+	l2Dates,
+	l3Dates
 }: { 
 	data: Equipment[],
 	vendorFilter: string,
@@ -33,16 +36,12 @@ export default function EquipmentTable({
 	levelFilter: string,
 	setLevelFilter: (l: string) => void,
 	vendors: string[],
-	areas: string[]
+	areas: string[],
+	l1Dates: { start: Date, end: Date, setStart: (d: Date) => void, setEnd: (d: Date) => void },
+	l2Dates: { start: Date, end: Date, setStart: (d: Date) => void, setEnd: (d: Date) => void },
+	l3Dates: { start: Date, end: Date, setStart: (d: Date) => void, setEnd: (d: Date) => void }
 }) {
 	const [showDebug, setShowDebug] = useState(false);
-
-	// State for dynamic reference dates (J1, W1, AQ1)
-	const [projectStartDate, setProjectStartDate] = useState<Date>(
-		PROJECT_START_DATE_DEFAULT,
-	);
-	const [l2RefDate, setL2RefDate] = useState<Date>(L2_REF_DATE_DEFAULT);
-	const [l3RefDate, setL3RefDate] = useState<Date>(L3_REF_DATE_DEFAULT);
 
 	// Helper to safely get date string or Date object
 	const getDate = (dateVal: any): Date | null => {
@@ -108,24 +107,6 @@ export default function EquipmentTable({
 		if (isDate(val)) return true;
 		const str = String(val).trim().toUpperCase();
 		return str === "Y" || str === "YES";
-	};
-
-	const handleL1DateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (e.target.value) {
-			setProjectStartDate(new Date(e.target.value));
-		}
-	};
-
-	const handleL2DateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (e.target.value) {
-			setL2RefDate(new Date(e.target.value));
-		}
-	};
-
-	const handleL3DateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (e.target.value) {
-			setL3RefDate(new Date(e.target.value));
-		}
 	};
 
 	const toInputDate = (date: Date) => {
@@ -379,39 +360,74 @@ export default function EquipmentTable({
 
 					<div className="w-px h-8 bg-gray-300 mx-2 hidden md:block"></div>
 
-					<div className="flex flex-col">
-						<label className="text-xs font-bold text-gray-700">
-							L1 Project Start Date ($J$1)
-						</label>
-						<input
-							type="date"
-							value={toInputDate(projectStartDate)}
-							onChange={handleL1DateChange}
-							className="text-sm p-1 border rounded text-black"
-						/>
-					</div>
-					<div className="flex flex-col">
-						<label className="text-xs font-bold text-gray-700">
-							L2 Reference Date ($W$1)
-						</label>
-						<input
-							type="date"
-							value={toInputDate(l2RefDate)}
-							onChange={handleL2DateChange}
-							className="text-sm p-1 border rounded text-black"
-						/>
-					</div>
-					<div className="flex flex-col">
-						<label className="text-xs font-bold text-gray-700">
-							L3 Reference Date ($AQ$1)
-						</label>
-						<input
-							type="date"
-							value={toInputDate(l3RefDate)}
-							onChange={handleL3DateChange}
-							className="text-sm p-1 border rounded text-black"
-						/>
-					</div>
+					{levelFilter === "L1" && (
+						<>
+							<div className="flex flex-col">
+								<label className="text-xs font-bold text-gray-700">L1 Plan Start Date</label>
+								<input
+									type="date"
+									value={toInputDate(l1Dates.start)}
+									onChange={(e) => l1Dates.setStart(new Date(e.target.value))}
+									className="text-sm p-1 border rounded text-black"
+								/>
+							</div>
+							<div className="flex flex-col">
+								<label className="text-xs font-bold text-gray-700">L1 Plan End Date</label>
+								<input
+									type="date"
+									value={toInputDate(l1Dates.end)}
+									onChange={(e) => l1Dates.setEnd(new Date(e.target.value))}
+									className="text-sm p-1 border rounded text-black"
+								/>
+							</div>
+						</>
+					)}
+
+					{levelFilter === "L2" && (
+						<>
+							<div className="flex flex-col">
+								<label className="text-xs font-bold text-gray-700">L2 Plan Start Date</label>
+								<input
+									type="date"
+									value={toInputDate(l2Dates.start)}
+									onChange={(e) => l2Dates.setStart(new Date(e.target.value))}
+									className="text-sm p-1 border rounded text-black"
+								/>
+							</div>
+							<div className="flex flex-col">
+								<label className="text-xs font-bold text-gray-700">L2 Plan End Date</label>
+								<input
+									type="date"
+									value={toInputDate(l2Dates.end)}
+									onChange={(e) => l2Dates.setEnd(new Date(e.target.value))}
+									className="text-sm p-1 border rounded text-black"
+								/>
+							</div>
+						</>
+					)}
+
+					{levelFilter === "L3" && (
+						<>
+							<div className="flex flex-col">
+								<label className="text-xs font-bold text-gray-700">L3 Plan Start Date</label>
+								<input
+									type="date"
+									value={toInputDate(l3Dates.start)}
+									onChange={(e) => l3Dates.setStart(new Date(e.target.value))}
+									className="text-sm p-1 border rounded text-black"
+								/>
+							</div>
+							<div className="flex flex-col">
+								<label className="text-xs font-bold text-gray-700">L3 Plan End Date</label>
+								<input
+									type="date"
+									value={toInputDate(l3Dates.end)}
+									onChange={(e) => l3Dates.setEnd(new Date(e.target.value))}
+									className="text-sm p-1 border rounded text-black"
+								/>
+							</div>
+						</>
+					)}
 				</div>
 				<button
 					onClick={() => setShowDebug(!showDebug)}
@@ -701,48 +717,36 @@ export default function EquipmentTable({
 					<tbody className="bg-white divide-y divide-gray-200">
 						{data.map((item, idx) => {
 							// --- L1 Calculations ---
-                            // Plan Start is now taken from projectStartDate state (J1)
-							const l1PlanStart = projectStartDate;
+							const l1PlanStart = l1Dates.start;
+							const l1PlanEnd = l1Dates.end;
 							const rojDate = getDate(item.roj_date);
-							const msraSubmit = l1PlanStart ? addDays(l1PlanStart, -14) : null;
-							const ptwSubmit = l1PlanStart ? addDays(l1PlanStart, -1) : null;
-							const l1PlanEnd = l1PlanStart ? addDays(l1PlanStart, 21) : null;
-							const saiDate = l1PlanStart ? addDays(l1PlanStart, 7) : null;
-							const anchorSpecDate = l1PlanStart
-								? addDays(l1PlanStart, 7)
-								: null;
-							const posAnchorStart = l1PlanStart
-								? addDays(l1PlanStart, 14)
-								: null;
-							const anchorVerifiedQC = l1PlanStart
-								? addDays(l1PlanStart, 21)
-								: null;
+							const msraSubmit = addDays(l1PlanStart, -14);
+							const ptwSubmit = addDays(l1PlanStart, -1);
+							const saiDate = addDays(l1PlanStart, 7);
+							const anchorSpecDate = addDays(l1PlanStart, 7);
+							const posAnchorStart = addDays(l1PlanStart, 14);
+							const anchorVerifiedQC = addDays(l1PlanStart, 21);
 							const redTagPassedCalc = anchorVerifiedQC;
 
 							const l1TotalDays = getDurationDays(l1PlanStart, l1PlanEnd);
-							const l1PlanWeeks = getWeekNum(l1PlanStart, projectStartDate);
+							const l1PlanWeeks = getWeekNum(l1PlanStart, l1Dates.start);
 							const l1ActualWeeks = getWeekNum(
 								redTagPassedCalc,
-								projectStartDate,
+								l1Dates.start,
 							);
 
 							// --- L2 Calculations ---
-                            // L2 Start Date is now taken from l2RefDate state (W1)
-							const l2Start = l2RefDate;
-							const l2End = l2Start ? addDays(l2Start, 21) : null;
-							const msraDueL2 = l2Start ? addDays(l2Start, -14) : null;
-							const cableInPlace = l2Start ? addDays(l2Start, -1) : null;
+							const l2Start = l2Dates.start;
+							const l2End = l2Dates.end;
+							const msraDueL2 = addDays(l2Start, -14);
+							const cableInPlace = addDays(l2Start, -1);
 							const elecTests = l2Start;
 							const mechTests = l2Start;
-							const installerPS = mechTests ? addDays(mechTests, 7) : null;
-							const qaqcScript = installerPS ? addDays(installerPS, 1) : null;
-							const docsUploaded = qaqcScript ? addDays(qaqcScript, 2) : null;
-							const lotoImplemented = qaqcScript
-								? addDays(qaqcScript, 2)
-								: null;
-							const ivcCompleted = lotoImplemented
-								? addDays(lotoImplemented, 1)
-								: null;
+							const installerPS = addDays(mechTests, 7);
+							const qaqcScript = addDays(installerPS, 1);
+							const docsUploaded = addDays(qaqcScript, 2);
+							const lotoImplemented = addDays(qaqcScript, 2);
+							const ivcCompleted = addDays(lotoImplemented, 1);
 
 							const cytRequired = item.cyt_required || "Y";
 							const cytEnd =
@@ -753,8 +757,8 @@ export default function EquipmentTable({
 							const ytPassedCalc = cytEnd || ivcCompleted;
 
 							const l2TotalDays = getDurationDays(l2Start, l2End);
-							const l2PlanWeeks = getWeekNum(l2Start, l2RefDate);
-							const l2ActualWeeks = getWeekNum(ytPassedCalc, projectStartDate);
+							const l2PlanWeeks = getWeekNum(l2Start, l2Dates.start);
+							const l2ActualWeeks = getWeekNum(ytPassedCalc, l1Dates.start);
 
 							const instTermDuration =
 								l2Start && redTagPassedCalc
@@ -762,46 +766,40 @@ export default function EquipmentTable({
 									: "";
 
 							// --- L3 Calculations ---
-                            // L3 Start Date is now taken from l3RefDate state (AQ1)
-							const l3Start = l3RefDate;
-							const l3End = l3Start ? addDays(l3Start, 8) : null;
+							const l3Start = l3Dates.start;
+							const l3End = l3Dates.end;
 							const l3TotalDays = getDurationDays(l3Start, l3End);
-							const l3PlanWeeks = getWeekNum(l3Start, projectStartDate);
+							const l3PlanWeeks = getWeekNum(l3Start, l1Dates.start);
 
-							const energMSRA = l3Start ? addDays(l3Start, -30) : null;
-							const commScripts = l3Start ? addDays(l3Start, -30) : null;
-							const lbPlan = l3Start ? addDays(l3Start, -45) : null;
-							const startupPlan = l3Start ? addDays(l3Start, -30) : null;
-							const preEnergMtg = l3Start ? addDays(l3Start, -7) : null;
-							const energPlan = l3Start ? addDays(l3Start, -5) : null;
-							const tempLB = l3Start ? addDays(l3Start, -7) : null;
+							const energMSRA = addDays(l3Start, -30);
+							const commScripts = addDays(l3Start, -30);
+							const lbPlan = addDays(l3Start, -45);
+							const startupPlan = addDays(l3Start, -30);
+							const preEnergMtg = addDays(l3Start, -7);
+							const energPlan = addDays(l3Start, -5);
+							const tempLB = addDays(l3Start, -7);
 							const energizedDate = l3Start;
 							const l3PtwSubmit = energizedDate
 								? addDays(energizedDate, -1)
 								: null;
-							const l3StartupScripts = l3Start ? addDays(l3Start, 1) : null;
-							const loadBurnIn = energizedDate
-								? addDays(energizedDate, 1)
-								: null;
-							const irScan = energizedDate ? addDays(energizedDate, 3) : null;
-							const epmsVerif = energizedDate
-								? addDays(energizedDate, 3)
-								: null;
+							const l3StartupScripts = addDays(l3Start, 1);
+							const loadBurnIn = addDays(energizedDate, 1);
+							const irScan = addDays(energizedDate, 3);
+							const epmsVerif = addDays(energizedDate, 3);
 
 							const greenTagPassedCalc = epmsVerif;
 							const l3ActualWeeks = getWeekNum(
 								greenTagPassedCalc,
-								projectStartDate,
+								l1Dates.start,
 							);
 
 							// --- Status Function Calls ---
-                            // Using the reference dates as "Now" for reporting
-							const l1Status = getL1Status(item, l1PlanStart, projectStartDate);
-							const l2Status = getL2Status(item, l2Start, l2RefDate);
+							const l1Status = getL1Status(item, l1PlanStart, l1Dates.start);
+							const l2Status = getL2Status(item, l2Start, l2Dates.start);
                             const l3Status = getL3Status(
                                 item, 
                                 l3Start, 
-                                l3RefDate, 
+                                l3Dates.start, 
                                 energMSRA, 
                                 commScripts, 
                                 lbPlan, 
