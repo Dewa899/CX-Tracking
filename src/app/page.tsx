@@ -1,5 +1,5 @@
 import { db } from '@/lib/firebaseAdmin';
-import EquipmentTable from '@/components/EquipmentTable';
+import ClientDashboard from '@/components/ClientDashboard';
 
 export const revalidate = 3600;
 
@@ -9,12 +9,10 @@ async function getEquipments() {
     if (snapshot.empty) {
       return [];
     }
-    // Serialize data: Convert Firestore Timestamps to generic objects or strings
     return snapshot.docs.map(doc => {
       const data = doc.data();
       const serializedData: any = { 
         id: doc.id,
-        // Map verbose Excel keys to cleaner keys for the component
         no: data['NO'],
         equipment_id: data['EQUIPMENT ID'],
         type: data['TYPE'],
@@ -82,10 +80,8 @@ async function getEquipments() {
         ...data 
       };
       
-      // Basic recursive serialization for timestamps (legacy check, though we are mapping mostly strings now from JSON upload)
       for (const key in serializedData) {
         if (serializedData[key] && typeof serializedData[key] === 'object') {
-           // Check for Firestore Timestamp (duck typing)
            if ('_seconds' in serializedData[key]) {
              serializedData[key] = {
                _seconds: serializedData[key]._seconds,
@@ -115,35 +111,7 @@ async function getEquipments() {
 export default async function Home() {
   const equipments = await getEquipments();
 
-  const totalEquipments = equipments.length;
-  const areaCounts = equipments.reduce((acc: Record<string, number>, item: any) => {
-    const area = item.area || 'Unknown';
-    acc[area] = (acc[area] || 0) + 1;
-    return acc;
-  }, {});
-
   return (
-    <main className="min-h-screen p-4 md:p-8 bg-gray-50">
-      <div className="max-w-[98%] mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-black">CX Tracking Schedule</h1>
-        
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
-            <h3 className="text-gray-500 text-sm font-medium">Total Equipment</h3>
-            <p className="text-2xl font-bold text-gray-800">{totalEquipments}</p>
-          </div>
-          {Object.entries(areaCounts).map(([area, count]) => (
-            <div key={area} className="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
-              <h3 className="text-gray-500 text-sm font-medium">Area: {area}</h3>
-              <p className="text-2xl font-bold text-gray-800">{count}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-4">
-             <EquipmentTable data={equipments} />
-        </div>
-      </div>
-    </main>
+    <ClientDashboard initialData={equipments} />
   );
 }

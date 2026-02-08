@@ -14,11 +14,28 @@ const L2_REF_DATE_DEFAULT = new Date("2026-01-26");
 // AQ1 Reference Date for L3 (Estimated from data)
 const L3_REF_DATE_DEFAULT = new Date("2026-04-22");
 
-export default function EquipmentTable({ data }: { data: Equipment[] }) {
+export default function EquipmentTable({ 
+	data,
+	vendorFilter,
+	setVendorFilter,
+	areaFilter,
+	setAreaFilter,
+	levelFilter,
+	setLevelFilter,
+	vendors,
+	areas
+}: { 
+	data: Equipment[],
+	vendorFilter: string,
+	setVendorFilter: (v: string) => void,
+	areaFilter: string,
+	setAreaFilter: (a: string) => void,
+	levelFilter: string,
+	setLevelFilter: (l: string) => void,
+	vendors: string[],
+	areas: string[]
+}) {
 	const [showDebug, setShowDebug] = useState(false);
-	const [vendorFilter, setVendorFilter] = useState("All");
-	const [areaFilter, setAreaFilter] = useState("All");
-	const [levelFilter, setLevelFilter] = useState("All");
 
 	// State for dynamic reference dates (J1, W1, AQ1)
 	const [projectStartDate, setProjectStartDate] = useState<Date>(
@@ -114,16 +131,6 @@ export default function EquipmentTable({ data }: { data: Equipment[] }) {
 	const toInputDate = (date: Date) => {
 		return date.toISOString().split("T")[0];
 	};
-
-	// --- Filtering Logic ---
-	const vendors = ["All", ...Array.from(new Set(data.map(item => item.subcont_vendor).filter(Boolean)))].sort();
-	const areas = ["All", ...Array.from(new Set(data.map(item => item.area).filter(Boolean)))].sort();
-	
-	const filteredData = data.filter(item => {
-		const matchVendor = vendorFilter === "All" || item.subcont_vendor === vendorFilter;
-		const matchArea = areaFilter === "All" || item.area === areaFilter;
-		return matchVendor && matchArea;
-	});
 
 	// --- Status Logic Functions ---
 
@@ -690,7 +697,7 @@ export default function EquipmentTable({ data }: { data: Equipment[] }) {
 						</tr>
 					</thead>
 					<tbody className="bg-white divide-y divide-gray-200">
-						{filteredData.map((item, idx) => {
+						{data.map((item, idx) => {
 							// --- L1 Calculations ---
                             // Plan Start is now taken from projectStartDate state (J1)
 							const l1PlanStart = projectStartDate;
