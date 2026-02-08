@@ -17,6 +17,7 @@ const L3_REF_DATE_DEFAULT = new Date("2026-04-22");
 export default function EquipmentTable({ data }: { data: Equipment[] }) {
 	const [showDebug, setShowDebug] = useState(false);
 	const [vendorFilter, setVendorFilter] = useState("All");
+	const [areaFilter, setAreaFilter] = useState("All");
 	const [levelFilter, setLevelFilter] = useState("All");
 
 	// State for dynamic reference dates (J1, W1, AQ1)
@@ -116,10 +117,12 @@ export default function EquipmentTable({ data }: { data: Equipment[] }) {
 
 	// --- Filtering Logic ---
 	const vendors = ["All", ...Array.from(new Set(data.map(item => item.subcont_vendor).filter(Boolean)))].sort();
+	const areas = ["All", ...Array.from(new Set(data.map(item => item.area).filter(Boolean)))].sort();
 	
 	const filteredData = data.filter(item => {
 		const matchVendor = vendorFilter === "All" || item.subcont_vendor === vendorFilter;
-		return matchVendor;
+		const matchArea = areaFilter === "All" || item.area === areaFilter;
+		return matchVendor && matchArea;
 	});
 
 	// --- Status Logic Functions ---
@@ -335,6 +338,19 @@ export default function EquipmentTable({ data }: { data: Equipment[] }) {
 							className="text-sm p-1 border rounded bg-white text-black"
 						>
 							{vendors.map(v => <option key={v} value={v}>{v}</option>)}
+						</select>
+					</div>
+
+					<div className="flex flex-col">
+						<label className="text-xs font-bold text-gray-700">
+							Filter Area
+						</label>
+						<select 
+							value={areaFilter}
+							onChange={(e) => setAreaFilter(e.target.value)}
+							className="text-sm p-1 border rounded bg-white text-black"
+						>
+							{areas.map(a => <option key={a} value={a}>{a}</option>)}
 						</select>
 					</div>
 
