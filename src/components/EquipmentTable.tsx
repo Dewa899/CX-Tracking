@@ -16,6 +16,8 @@ const L3_REF_DATE_DEFAULT = new Date("2026-04-22");
 
 export default function EquipmentTable({ data }: { data: Equipment[] }) {
 	const [showDebug, setShowDebug] = useState(false);
+	const [vendorFilter, setVendorFilter] = useState("All");
+	const [levelFilter, setLevelFilter] = useState("All");
 
 	// State for dynamic reference dates (J1, W1, AQ1)
 	const [projectStartDate, setProjectStartDate] = useState<Date>(
@@ -111,6 +113,14 @@ export default function EquipmentTable({ data }: { data: Equipment[] }) {
 	const toInputDate = (date: Date) => {
 		return date.toISOString().split("T")[0];
 	};
+
+	// --- Filtering Logic ---
+	const vendors = ["All", ...Array.from(new Set(data.map(item => item.subcont_vendor).filter(Boolean)))].sort();
+	
+	const filteredData = data.filter(item => {
+		const matchVendor = vendorFilter === "All" || item.subcont_vendor === vendorFilter;
+		return matchVendor;
+	});
 
 	// --- Status Logic Functions ---
 
@@ -314,6 +324,38 @@ export default function EquipmentTable({ data }: { data: Equipment[] }) {
 		<div className="flex flex-col gap-4">
 			<div className="flex justify-between items-center bg-gray-100 p-3 rounded-lg border">
 				<div className="flex gap-4 items-center flex-wrap">
+					{/* Dropdown Filters */}
+					<div className="flex flex-col">
+						<label className="text-xs font-bold text-gray-700">
+							Filter Vendor
+						</label>
+						<select 
+							value={vendorFilter}
+							onChange={(e) => setVendorFilter(e.target.value)}
+							className="text-sm p-1 border rounded bg-white text-black"
+						>
+							{vendors.map(v => <option key={v} value={v}>{v}</option>)}
+						</select>
+					</div>
+
+					<div className="flex flex-col">
+						<label className="text-xs font-bold text-gray-700">
+							Filter Process Level
+						</label>
+						<select 
+							value={levelFilter}
+							onChange={(e) => setLevelFilter(e.target.value)}
+							className="text-sm p-1 border rounded bg-white text-black"
+						>
+							<option value="All">All Levels</option>
+							<option value="L1">L1 - RED TAG</option>
+							<option value="L2">L2 - YELLOW TAG</option>
+							<option value="L3">L3 - GREEN TAG</option>
+						</select>
+					</div>
+
+					<div className="w-px h-8 bg-gray-300 mx-2 hidden md:block"></div>
+
 					<div className="flex flex-col">
 						<label className="text-xs font-bold text-gray-700">
 							L1 Project Start Date ($J$1)
@@ -322,7 +364,7 @@ export default function EquipmentTable({ data }: { data: Equipment[] }) {
 							type="date"
 							value={toInputDate(projectStartDate)}
 							onChange={handleL1DateChange}
-							className="text-sm p-1 border rounded"
+							className="text-sm p-1 border rounded text-black"
 						/>
 					</div>
 					<div className="flex flex-col">
@@ -333,7 +375,7 @@ export default function EquipmentTable({ data }: { data: Equipment[] }) {
 							type="date"
 							value={toInputDate(l2RefDate)}
 							onChange={handleL2DateChange}
-							className="text-sm p-1 border rounded"
+							className="text-sm p-1 border rounded text-black"
 						/>
 					</div>
 					<div className="flex flex-col">
@@ -344,13 +386,13 @@ export default function EquipmentTable({ data }: { data: Equipment[] }) {
 							type="date"
 							value={toInputDate(l3RefDate)}
 							onChange={handleL3DateChange}
-							className="text-sm p-1 border rounded"
+							className="text-sm p-1 border rounded text-black"
 						/>
 					</div>
 				</div>
 				<button
 					onClick={() => setShowDebug(!showDebug)}
-					className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+					className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300 transition-colors text-black font-medium"
 				>
 					{showDebug ? "Hide Debug Data" : "Show Debug Data"}
 				</button>
@@ -392,229 +434,247 @@ export default function EquipmentTable({ data }: { data: Equipment[] }) {
 								Subcont/ Vendor
 							</th>
 
-							<th
-								colSpan={17}
-								className="px-2 py-2 border text-center font-bold bg-red-200 text-black"
-							>
-								L1 - RED TAG
-							</th>
-							<th
-								colSpan={23}
-								className="px-2 py-2 border text-center font-bold bg-yellow-200 text-black"
-							>
-								L2 - YELLOW TAG
-							</th>
-							<th
-								colSpan={24}
-								className="px-2 py-2 border text-center font-bold bg-green-200 text-black"
-							>
-								L3 - GREEN TAG
-							</th>
+							{(levelFilter === "All" || levelFilter === "L1") && (
+								<th
+									colSpan={17}
+									className="px-2 py-2 border text-center font-bold bg-red-200 text-black"
+								>
+									L1 - RED TAG
+								</th>
+							)}
+							{(levelFilter === "All" || levelFilter === "L2") && (
+								<th
+									colSpan={23}
+									className="px-2 py-2 border text-center font-bold bg-yellow-200 text-black"
+								>
+									L2 - YELLOW TAG
+								</th>
+							)}
+							{(levelFilter === "All" || levelFilter === "L3") && (
+								<th
+									colSpan={24}
+									className="px-2 py-2 border text-center font-bold bg-green-200 text-black"
+								>
+									L3 - GREEN TAG
+								</th>
+							)}
 						</tr>
 
 						{/* Level 1 Headers */}
 						<tr>
 							{/* L1 Columns */}
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
-								ROJ Date
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
-								MSRA Submit
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
-								PTW Submit
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
-								Plan Start
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
-								Plan End
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold w-16 text-black">
-								Total Days
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold w-16 text-black">
-								Plan Weeks
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
-								SAI Date
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
-								Submit Anchore Spec
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
-								Positioning Anchoring Start
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
-								Anchored Verified QC
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
-								Red Tag Passed
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold w-16 text-black">
-								Actual Weeks
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
-								Status
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[150px] text-black">
-								Remark Cx
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[150px] text-black">
-								Remarks PTW+MSRA
-							</th>
-							<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
-								Inst & Term Duration
-							</th>
+							{(levelFilter === "All" || levelFilter === "L1") && (
+								<>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
+										ROJ Date
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
+										MSRA Submit
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
+										PTW Submit
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
+										Plan Start
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
+										Plan End
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold w-16 text-black">
+										Total Days
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold w-16 text-black">
+										Plan Weeks
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
+										SAI Date
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
+										Submit Anchore Spec
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
+										Positioning Anchoring Start
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
+										Anchored Verified QC
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
+										Red Tag Passed
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold w-16 text-black">
+										Actual Weeks
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
+										Status
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[150px] text-black">
+										Remark Cx
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[150px] text-black">
+										Remarks PTW+MSRA
+									</th>
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black">
+										Inst & Term Duration
+									</th>
+								</>
+							)}
 
 							{/* L2 Columns */}
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								Start Date
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								End Date
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black">
-								Total Days
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black">
-								Plan Weeks
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								MSRA+LOTO Submit
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								Power/Control Cable Inplace
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								Elec Tests
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								Mech Tests
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								Installer Pre-Startup
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black">
-								Vendor PS Req?
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								Vendor Pre-Startup
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								L2 QA/QC Script
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								L2 Docs Uploaded
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								LOTO Implemented
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								IVC Completed
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black">
-								CYT?
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								CYT End Date
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black">
-								CYT Finish?
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								YT Passed
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black">
-								Actual Weeks
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
-								Status
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[150px] text-black">
-								Remark Cx
-							</th>
-							<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[150px] text-black">
-								Remarks PTW
-							</th>
+							{(levelFilter === "All" || levelFilter === "L2") && (
+								<>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										Start Date
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										End Date
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black">
+										Total Days
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black">
+										Plan Weeks
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										MSRA+LOTO Submit
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										Power/Control Cable Inplace
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										Elec Tests
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										Mech Tests
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										Installer Pre-Startup
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black">
+										Vendor PS Req?
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										Vendor Pre-Startup
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										L2 QA/QC Script
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										L2 Docs Uploaded
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										LOTO Implemented
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										IVC Completed
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black">
+										CYT?
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										CYT End Date
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black">
+										CYT Finish?
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										YT Passed
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black">
+										Actual Weeks
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black">
+										Status
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[150px] text-black">
+										Remark Cx
+									</th>
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[150px] text-black">
+										Remarks PTW
+									</th>
+								</>
+							)}
 
 							{/* L3 Columns */}
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								Start Date
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								End Date
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black">
-								Total Days
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black">
-								Plan Weeks
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								Energization MSRA
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								Comm Scripts
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								Load Bank Plan
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								Startup Plan
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								Pre-Energ Mtg
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								Energization Plan
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black">
-								LB Req?
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								Temp LB Install
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								PTW Submit
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								Energized Date
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								L3 Startup Scripts
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black">
-								FoK Witnessed?
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								Load & Burn in
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								IR Scan/TMS Rpt
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								EPMS Verif
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								Open/Close Issues
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								Green Tag Passed
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black">
-								Actual Weeks
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
-								Status
-							</th>
-							<th className="px-2 py-1 border bg-green-100 font-bold min-w-[150px] text-black">
-								Remarks Cx/PTW
-							</th>
+							{(levelFilter === "All" || levelFilter === "L3") && (
+								<>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										Start Date
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										End Date
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black">
+										Total Days
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black">
+										Plan Weeks
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										Energization MSRA
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										Comm Scripts
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										Load Bank Plan
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										Startup Plan
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										Pre-Energ Mtg
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										Energization Plan
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black">
+										LB Req?
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										Temp LB Install
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										PTW Submit
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										Energized Date
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										L3 Startup Scripts
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black">
+										FoK Witnessed?
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										Load & Burn in
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										IR Scan/TMS Rpt
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										EPMS Verif
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										Open/Close Issues
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										Green Tag Passed
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black">
+										Actual Weeks
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black">
+										Status
+									</th>
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[150px] text-black">
+										Remarks Cx/PTW
+									</th>
+								</>
+							)}
 						</tr>
 					</thead>
 					<tbody className="bg-white divide-y divide-gray-200">
-						{data.map((item, idx) => {
+						{filteredData.map((item, idx) => {
 							// --- L1 Calculations ---
                             // Plan Start is now taken from projectStartDate state (J1)
 							const l1PlanStart = projectStartDate;
@@ -750,202 +810,214 @@ export default function EquipmentTable({ data }: { data: Equipment[] }) {
 										</td>
 
 										{/* L1 */}
-										<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
-											{formatDate(item.roj_date)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
-											{formatDate(msraSubmit)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
-											{formatDate(ptwSubmit)}
-										</td>
-										<td className="px-2 py-1 border font-bold text-blue-800 bg-blue-50/50">
-											{formatDate(l1PlanStart)}
-										</td>
-										<td className="px-2 py-1 border font-bold text-blue-800 bg-blue-50/50">
-											{formatDate(l1PlanEnd)}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{l1TotalDays}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{l1PlanWeeks}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
-											{formatDate(saiDate)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
-											{formatDate(anchorSpecDate)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
-											{formatDate(posAnchorStart)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
-											{formatDate(anchorVerifiedQC)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
-											{formatDate(redTagPassedCalc)}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{l1ActualWeeks}
-										</td>
-										<td className="px-2 py-1 border font-medium">{l1Status}</td>
-										<td
-											className="px-2 py-1 border truncate max-w-[150px] font-medium"
-											title={item.l1_remark_cx}
-										>
-											{item.l1_remark_cx || "-"}
-										</td>
-										<td
-											className="px-2 py-1 border truncate max-w-[150px] font-medium"
-											title={item.l1_remarks_ptw}
-										>
-											{item.l1_remarks_ptw || "-"}
-										</td>
-										<td className="px-2 py-1 border text-center font-bold">
-											{instTermDuration}
-										</td>
+										{(levelFilter === "All" || levelFilter === "L1") && (
+											<>
+												<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
+													{formatDate(item.roj_date)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
+													{formatDate(msraSubmit)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
+													{formatDate(ptwSubmit)}
+												</td>
+												<td className="px-2 py-1 border font-bold text-blue-800 bg-blue-50/50">
+													{formatDate(l1PlanStart)}
+												</td>
+												<td className="px-2 py-1 border font-bold text-blue-800 bg-blue-50/50">
+													{formatDate(l1PlanEnd)}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{l1TotalDays}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{l1PlanWeeks}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
+													{formatDate(saiDate)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
+													{formatDate(anchorSpecDate)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
+													{formatDate(posAnchorStart)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
+													{formatDate(anchorVerifiedQC)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-red-50 text-red-900">
+													{formatDate(redTagPassedCalc)}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{l1ActualWeeks}
+												</td>
+												<td className="px-2 py-1 border font-medium">{l1Status}</td>
+												<td
+													className="px-2 py-1 border truncate max-w-[150px] font-medium"
+													title={item.l1_remark_cx}
+												>
+													{item.l1_remark_cx || "-"}
+												</td>
+												<td
+													className="px-2 py-1 border truncate max-w-[150px] font-medium"
+													title={item.l1_remarks_ptw}
+												>
+													{item.l1_remarks_ptw || "-"}
+												</td>
+												<td className="px-2 py-1 border text-center font-bold">
+													{instTermDuration}
+												</td>
+											</>
+										)}
 
 										{/* L2 */}
-										<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
-											{formatDate(item.l2_start_date)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
-											{formatDate(l2End)}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{l2TotalDays}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{l2PlanWeeks}
-										</td>
-										<td className="px-2 py-1 border font-bold text-blue-800 bg-blue-50/50">
-											{formatDate(msraDueL2)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
-											{formatDate(cableInPlace)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
-											{formatDate(elecTests)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
-											{formatDate(mechTests)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
-											{formatDate(installerPS)}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{item.vendor_ps_required || "-"}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
-											{formatDate(item.vendor_pre_startup_completed)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
-											{formatDate(qaqcScript)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
-											{formatDate(docsUploaded)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
-											{formatDate(lotoImplemented)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
-											{formatDate(ivcCompleted)}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{item.cyt_required || "-"}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
-											{formatDate(cytEnd)}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{item.cyt_finished || "-"}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
-											{formatDate(ytPassedCalc)}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{l2ActualWeeks}
-										</td>
-										<td className="px-2 py-1 border font-medium">{l2Status}</td>
-										<td className="px-2 py-1 border truncate max-w-[150px] font-medium">
-											{item.l2_remark_cx || "-"}
-										</td>
-										<td className="px-2 py-1 border truncate max-w-[150px] font-medium">
-											{item.l2_remarks_ptw || "-"}
-										</td>
+										{(levelFilter === "All" || levelFilter === "L2") && (
+											<>
+												<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
+													{formatDate(item.l2_start_date)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
+													{formatDate(l2End)}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{l2TotalDays}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{l2PlanWeeks}
+												</td>
+												<td className="px-2 py-1 border font-bold text-blue-800 bg-blue-50/50">
+													{formatDate(msraDueL2)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
+													{formatDate(cableInPlace)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
+													{formatDate(elecTests)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
+													{formatDate(mechTests)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
+													{formatDate(installerPS)}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{item.vendor_ps_required || "-"}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
+													{formatDate(item.vendor_pre_startup_completed)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
+													{formatDate(qaqcScript)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
+													{formatDate(docsUploaded)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
+													{formatDate(lotoImplemented)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
+													{formatDate(ivcCompleted)}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{item.cyt_required || "-"}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
+													{formatDate(cytEnd)}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{item.cyt_finished || "-"}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-yellow-50 text-yellow-900">
+													{formatDate(ytPassedCalc)}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{l2ActualWeeks}
+												</td>
+												<td className="px-2 py-1 border font-medium">{l2Status}</td>
+												<td className="px-2 py-1 border truncate max-w-[150px] font-medium">
+													{item.l2_remark_cx || "-"}
+												</td>
+												<td className="px-2 py-1 border truncate max-w-[150px] font-medium">
+													{item.l2_remarks_ptw || "-"}
+												</td>
+											</>
+										)}
 
 										{/* L3 */}
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(item.l3_start_date)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(l3End)}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{l3TotalDays}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{l3PlanWeeks}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(energMSRA)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(commScripts)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(lbPlan)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(startupPlan)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(preEnergMtg)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(energPlan)}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{item.load_bank_required || "-"}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(tempLB)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(l3PtwSubmit)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(energizedDate)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(l3StartupScripts)}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{item.fok_witnessed || "-"}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(loadBurnIn)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(irScan)}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(epmsVerif)}
-										</td>
-										<td className="px-2 py-1 border font-medium">
-											{item.open_close_issues || "-"}
-										</td>
-										<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
-											{formatDate(greenTagPassedCalc)}
-										</td>
-										<td className="px-2 py-1 border text-center font-medium">
-											{l3ActualWeeks}
-										</td>
-										<td className="px-2 py-1 border font-medium">{l3Status}</td>
-										<td className="px-2 py-1 border truncate max-w-[150px] font-medium">
-											{item.l3_remarks || "-"}
-										</td>
+										{(levelFilter === "All" || levelFilter === "L3") && (
+											<>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(item.l3_start_date)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(l3End)}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{l3TotalDays}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{l3PlanWeeks}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(energMSRA)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(commScripts)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(lbPlan)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(startupPlan)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(preEnergMtg)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(energPlan)}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{item.load_bank_required || "-"}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(tempLB)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(l3PtwSubmit)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(energizedDate)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(l3StartupScripts)}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{item.fok_witnessed || "-"}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(loadBurnIn)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(irScan)}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(epmsVerif)}
+												</td>
+												<td className="px-2 py-1 border font-medium">
+													{item.open_close_issues || "-"}
+												</td>
+												<td className="px-2 py-1 border font-medium bg-green-50 text-green-900">
+													{formatDate(greenTagPassedCalc)}
+												</td>
+												<td className="px-2 py-1 border text-center font-medium">
+													{l3ActualWeeks}
+												</td>
+												<td className="px-2 py-1 border font-medium">{l3Status}</td>
+												<td className="px-2 py-1 border truncate max-w-[150px] font-medium">
+													{item.l3_remarks || "-"}
+												</td>
+											</>
+										)}
 									</tr>
 									{showDebug && (
 										<tr>
