@@ -438,12 +438,14 @@ export default function EquipmentTable({
 							>
 								Equipment ID
 							</th>
-							<th
-								rowSpan={2}
-								className="px-2 py-2 border text-left font-bold min-w-[100px] bg-gray-50 text-black"
-							>
-								Type
-							</th>
+							{vendorFilter === "All" && areaFilter === "All" && levelFilter === "All" && (
+								<th
+									rowSpan={2}
+									className="px-2 py-2 border text-left font-bold min-w-[100px] bg-gray-50 text-black"
+								>
+									Type
+								</th>
+							)}
 							<th
 								rowSpan={2}
 								className="px-2 py-2 border text-left font-bold min-w-[100px] bg-gray-50 text-black"
@@ -822,9 +824,11 @@ export default function EquipmentTable({
 										<td className="px-2 py-2 border font-bold bg-white sticky left-10 z-10">
 											{item.equipment_id || item.id}
 										</td>
-										<td className="px-2 py-2 border font-medium">
-											{item.type || "-"}
-										</td>
+										{vendorFilter === "All" && areaFilter === "All" && levelFilter === "All" && (
+											<td className="px-2 py-2 border font-medium">
+												{item.type || "-"}
+											</td>
+										)}
 										<td className="px-2 py-2 border font-medium">
 											{item.area || "-"}
 										</td>
