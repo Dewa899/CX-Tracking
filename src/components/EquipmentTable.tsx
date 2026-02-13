@@ -63,7 +63,7 @@ export default function EquipmentTable({
 
 	const formatDate = (dateVal: any) => {
 		const d = getDate(dateVal);
-		return d ? d.toLocaleDateString("en-GB") : "-";
+		return d ? d.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "2-digit" }) : "-";
 	};
 
 	const addDays = (date: Date | null, days: number): Date | null => {
@@ -444,33 +444,33 @@ export default function EquipmentTable({
 						<tr>
 							<th
 								rowSpan={2}
-								className="px-2 py-2 border text-left font-bold bg-gray-100 sticky left-0 top-0 z-40 w-10 text-black"
+								className="px-2 py-2 border text-left font-bold bg-gray-100 sticky left-0 top-0 z-40 w-10 text-black whitespace-normal leading-tight"
 							>
 								No
 							</th>
 							<th
 								rowSpan={2}
-								className="px-2 py-2 border text-left font-bold bg-gray-100 sticky left-10 top-0 z-40 w-24 text-black"
+								className="px-2 py-2 border text-left font-bold bg-gray-100 sticky left-10 top-0 z-40 w-24 text-black whitespace-normal leading-tight"
 							>
 								Equipment ID
 							</th>
 							{vendorFilter === "All" && areaFilter === "All" && levelFilter === "All" && (
 								<th
 									rowSpan={2}
-									className="px-2 py-2 border text-left font-bold min-w-[100px] bg-gray-50 text-black sticky top-0 z-20"
+									className="px-2 py-2 border text-left font-bold min-w-[100px] bg-gray-50 text-black sticky top-0 z-20 whitespace-normal leading-tight"
 								>
 									Type
 								</th>
 							)}
 							<th
 								rowSpan={2}
-								className="px-2 py-2 border text-left font-bold min-w-[100px] bg-gray-50 text-black sticky top-0 z-20"
+								className="px-2 py-2 border text-left font-bold min-w-[100px] bg-gray-50 text-black sticky top-0 z-20 whitespace-normal leading-tight"
 							>
 								Area
 							</th>
 							<th
 								rowSpan={2}
-								className="px-2 py-2 border text-left font-bold min-w-[100px] bg-gray-50 text-black sticky top-0 z-20"
+								className="px-2 py-2 border text-left font-bold min-w-[100px] bg-gray-50 text-black sticky top-0 z-20 whitespace-normal leading-tight"
 							>
 								Subcont/ Vendor
 							</th>
@@ -506,55 +506,55 @@ export default function EquipmentTable({
 							{/* L1 Columns */}
 							{(levelFilter === "All" || levelFilter === "L1") && (
 								<>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										ROJ Date
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										MSRA Submit
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										PTW Submit
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Plan Start
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Plan End
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Total Days
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Plan Weeks
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										SAI Date
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Submit Anchore Spec
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Positioning Anchoring Start
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Anchored Verified QC
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Red Tag Passed
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Actual Weeks
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Status
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[150px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[150px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Remark Cx
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[150px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[150px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Remarks PTW+MSRA
 									</th>
-									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-red-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Inst & Term Duration
 									</th>
 								</>
@@ -563,73 +563,73 @@ export default function EquipmentTable({
 							{/* L2 Columns */}
 							{(levelFilter === "All" || levelFilter === "L2") && (
 								<>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Start Date
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										End Date
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Total Days
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Plan Weeks
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										MSRA+LOTO Submit
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Power/Control Cable Inplace
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Elec Tests
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Mech Tests
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Installer Pre-Startup
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Vendor PS Req?
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Vendor Pre-Startup
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										L2 QA/QC Script
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										L2 Docs Uploaded
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										LOTO Implemented
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										IVC Completed
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										CYT?
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										CYT End Date
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										CYT Finish?
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										YT Passed
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Actual Weeks
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Status
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[150px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[150px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Remark Cx
 									</th>
-									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[150px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-yellow-100 font-bold min-w-[150px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Remarks PTW
 									</th>
 								</>
@@ -638,76 +638,76 @@ export default function EquipmentTable({
 							{/* L3 Columns */}
 							{(levelFilter === "All" || levelFilter === "L3") && (
 								<>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Start Date
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										End Date
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Total Days
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Plan Weeks
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Energization MSRA
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Comm Scripts
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Load Bank Plan
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Startup Plan
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Pre-Energ Mtg
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Energization Plan
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										LB Req?
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Temp LB Install
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										PTW Submit
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Energized Date
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										L3 Startup Scripts
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										FoK Witnessed?
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Load & Burn in
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										IR Scan/TMS Rpt
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										EPMS Verif
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Open/Close Issues
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Green Tag Passed
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold w-16 text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Actual Weeks
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[80px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[65px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Status
 									</th>
-									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[150px] text-black sticky top-[37px] z-20">
+									<th className="px-2 py-1 border bg-green-100 font-bold min-w-[150px] text-black sticky top-[37px] z-20 whitespace-normal leading-tight text-[10px]">
 										Remarks Cx/PTW
 									</th>
 								</>
