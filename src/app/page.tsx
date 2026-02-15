@@ -1,15 +1,37 @@
 import { db } from '@/lib/firebaseAdmin';
 import ClientDashboard from '@/components/ClientDashboard';
+import fs from 'fs';
+import path from 'path';
 
 export const revalidate = 3600;
 
 async function getEquipments() {
+  const isDev = process.env.NODE_ENV === 'development';
+  const mockFilePath = path.join(process.cwd(), 'src/lib/mockEquipments.json');
+
+  // 1. In Dev mode, try to return existing mock data first
+  if (isDev) {
+    try {
+      if (fs.existsSync(mockFilePath)) {
+        const rawData = fs.readFileSync(mockFilePath, 'utf8');
+        if (rawData.trim()) {
+          console.log('📦 Using local mock data (src/lib/mockEquipments.json)');
+          return JSON.parse(rawData);
+        }
+      }
+    } catch (error) {
+      console.error("Error reading mock data:", error);
+    }
+  }
+
+  // 2. If not Dev OR mock file doesn't exist, fetch from Firebase
   try {
+    console.log('🔥 Fetching real data from Firebase...');
     const snapshot = await db.collection('equipments').get();
     if (snapshot.empty) {
       return [];
     }
-    return snapshot.docs.map(doc => {
+    const equipments = snapshot.docs.map(doc => {
       const data = doc.data();
       const serializedData: any = { 
         id: doc.id,
@@ -20,6 +42,8 @@ async function getEquipments() {
         subcont_vendor: data['Subcont/ Vendor'],
         
         // L1
+        l1_plan_start: data['L1 - RED TAG Plan Start'],
+        l1_plan_end: data['L1 - RED TAG Plan End'],
         roj_date: data['L1 - RED TAG ROJ Date'],
         msra_submit: data['L1 - RED TAG MSRA Submit'],
         ptw_submit: data['L1 - RED TAG PTW Submit'],
@@ -102,6 +126,14 @@ async function getEquipments() {
       const noB = parseInt(String(b.no)) || 0;
       return noA - noB;
     });
+
+    // 3. Save to mock file in Dev mode for future use
+    if (isDev) {
+      console.log('💾 Saving real data to mock file for future development...');
+      fs.writeFileSync(mockFilePath, JSON.stringify(equipments, null, 2));
+    }
+
+    return equipments;
   } catch (error) {
     console.error("Error fetching equipments:", error);
     return [];

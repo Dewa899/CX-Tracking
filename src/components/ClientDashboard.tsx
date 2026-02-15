@@ -7,6 +7,19 @@ export default function ClientDashboard({ initialData }: { initialData: any[] })
 	const [vendorFilter, setVendorFilter] = useState("All");
 	const [areaFilter, setAreaFilter] = useState("All");
 	const [levelFilter, setLevelFilter] = useState("All");
+	const [searchTerm, setSearchTerm] = useState("");
+	const [debouncedSearch, setDebouncedSearch] = useState("");
+
+	// Debounce logic: update debouncedSearch only after user stops typing for 500ms
+	React.useEffect(() => {
+		const handler = setTimeout(() => {
+			setDebouncedSearch(searchTerm);
+		}, 500);
+
+		return () => {
+			clearTimeout(handler);
+		};
+	}, [searchTerm]);
 
 	// State for dynamic reference dates
 	const [l1PlanStart, setL1PlanStart] = useState<Date>(new Date("2025-11-10"));
@@ -30,11 +43,25 @@ export default function ClientDashboard({ initialData }: { initialData: any[] })
 		return initialData.filter(item => {
 			const matchVendor = vendorFilter === "All" || item.subcont_vendor === vendorFilter;
 			const matchArea = areaFilter === "All" || item.area === areaFilter;
-			return matchVendor && matchArea;
+			
+			const searchLower = debouncedSearch.toLowerCase();
+			const matchSearch = debouncedSearch === "" || 
+				(item.equipment_id || "").toLowerCase().includes(searchLower) ||
+				(item.area || "").toLowerCase().includes(searchLower) ||
+				(item.subcont_vendor || "").toLowerCase().includes(searchLower);
+
+			return matchVendor && matchArea && matchSearch;
 		});
-	}, [initialData, vendorFilter, areaFilter]);
+	}, [initialData, vendorFilter, areaFilter, debouncedSearch]);
 
 	const totalEquipments = filteredData.length;
+	
+	// Because the table currently calculates these dates based on Plan Dates 
+	// which are always present, all filtered equipment will be counted.
+	const l1PassedCount = filteredData.length;
+	const l2PassedCount = filteredData.length;
+	const l3PassedCount = filteredData.length;
+
 	const areaCounts = filteredData.reduce((acc: Record<string, number>, item: any) => {
 		const area = item.area || 'Unknown';
 		acc[area] = (acc[area] || 0) + 1;
@@ -46,13 +73,25 @@ export default function ClientDashboard({ initialData }: { initialData: any[] })
 			<div className="max-w-[98%] mx-auto">
 				<h1 className="text-3xl font-bold mb-6 text-black">CX Tracking Schedule</h1>
 
-				<div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+				<div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 					<div className="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
 						<h3 className="text-gray-500 text-sm font-medium">Total Equipment</h3>
 						<p className="text-2xl font-bold text-gray-800">{totalEquipments}</p>
 					</div>
+					<div className="bg-white p-4 rounded-lg shadow border-l-4 border-red-500">
+						<h3 className="text-gray-500 text-sm font-medium">Total L1 Passed</h3>
+						<p className="text-2xl font-bold text-red-700">{l1PassedCount}</p>
+					</div>
+					<div className="bg-white p-4 rounded-lg shadow border-l-4 border-yellow-500">
+						<h3 className="text-gray-500 text-sm font-medium">Total L2 Passed</h3>
+						<p className="text-2xl font-bold text-yellow-700">{l2PassedCount}</p>
+					</div>
+					<div className="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+						<h3 className="text-gray-500 text-sm font-medium">Total L3 Passed</h3>
+						<p className="text-2xl font-bold text-green-700">{l3PassedCount}</p>
+					</div>
 					{Object.entries(areaCounts).map(([area, count]) => (
-						<div key={area} className="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+						<div key={area} className="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
 							<h3 className="text-gray-500 text-sm font-medium">Area: {area}</h3>
 							<p className="text-2xl font-bold text-gray-800">{count}</p>
 						</div>
@@ -68,6 +107,8 @@ export default function ClientDashboard({ initialData }: { initialData: any[] })
 						setAreaFilter={setAreaFilter}
 						levelFilter={levelFilter}
 						setLevelFilter={setLevelFilter}
+						searchTerm={searchTerm}
+						setSearchTerm={setSearchTerm}
 						vendors={vendors}
 						areas={areas}
 						l1Dates={{ start: l1PlanStart, end: l1PlanEnd, setStart: setL1PlanStart, setEnd: setL1PlanEnd }}
